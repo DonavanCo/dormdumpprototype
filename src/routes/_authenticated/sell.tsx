@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ArrowLeft, ImagePlus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { categories, initialItems, useMarketplace } from '@/lib/marketplace';
-export const Route = createFileRoute('/sell')({ head: () => ({ meta: [{ title: 'Sell an item · Dorm Dump' }, { name: 'description', content: 'Create a sample listing for your campus community in the Dorm Dump prototype.' }, { property: 'og:title', content: 'Sell an item · Dorm Dump' }, { property: 'og:description', content: 'Your dorm essentials deserve a second home.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }), component: Sell });
+export const Route = createFileRoute('/_authenticated/sell')({ head: () => ({ meta: [{ title: 'Sell an item · Dorm Dump' }, { name: 'description', content: 'Create a sample listing for your campus community in the Dorm Dump prototype.' }, { property: 'og:title', content: 'Sell an item · Dorm Dump' }, { property: 'og:description', content: 'Your dorm essentials deserve a second home.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }), component: Sell });
 function Sell() {
   const { addItem } = useMarketplace(); const navigate = useNavigate();
   const [title, setTitle] = useState(''); const [description, setDescription] = useState(''); const [category, setCategory] = useState('Furniture'); const [condition, setCondition] = useState('Gently Used'); const [price, setPrice] = useState(''); const [photo, setPhoto] = useState(''); const [location, setLocation] = useState('Student Center');

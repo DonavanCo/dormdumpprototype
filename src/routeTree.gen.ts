@@ -10,15 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MyListingsRouteImport } from './routes/my-listings'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as ItemIdRouteImport } from './routes/item.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -41,6 +53,11 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ItemIdRoute = ItemIdRouteImport.update({
   id: '/item/$id',
   path: '/item/$id',
@@ -49,47 +66,74 @@ const ItemIdRoute = ItemIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/messages': typeof MessagesRoute
   '/my-listings': typeof MyListingsRoute
   '/saved': typeof SavedRoute
   '/sell': typeof SellRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/item/$id': typeof ItemIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/messages': typeof MessagesRoute
   '/my-listings': typeof MyListingsRoute
   '/saved': typeof SavedRoute
   '/sell': typeof SellRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/item/$id': typeof ItemIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/messages': typeof MessagesRoute
   '/my-listings': typeof MyListingsRoute
   '/saved': typeof SavedRoute
   '/sell': typeof SellRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/item/$id': typeof ItemIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/messages' | '/my-listings' | '/saved' | '/sell' | '/item/$id'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/messages' | '/my-listings' | '/saved' | '/sell' | '/item/$id'
-  id:
-    | '__root__'
     | '/'
+    | '/auth'
     | '/messages'
     | '/my-listings'
     | '/saved'
     | '/sell'
+    | '/profile'
+    | '/item/$id'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/auth'
+    | '/messages'
+    | '/my-listings'
+    | '/saved'
+    | '/sell'
+    | '/profile'
+    | '/item/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/messages'
+    | '/my-listings'
+    | '/saved'
+    | '/sell'
+    | '/_authenticated/profile'
     | '/item/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   MessagesRoute: typeof MessagesRoute
   MyListingsRoute: typeof MyListingsRoute
   SavedRoute: typeof SavedRoute
@@ -104,6 +148,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -134,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/item/$id': {
       id: '/item/$id'
       path: '/item/$id'
@@ -144,8 +209,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   MessagesRoute: MessagesRoute,
   MyListingsRoute: MyListingsRoute,
   SavedRoute: SavedRoute,
