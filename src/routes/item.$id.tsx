@@ -1,18 +1,65 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Check, Heart, MapPin, MessageCircle, ShieldCheck, Star, Leaf } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, CalendarDays, Check, Heart, MapPin, MessageCircle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMarketplace } from '@/lib/marketplace';
+import { useAuth } from '@/lib/auth';
+import { useRequireAccount } from '@/lib/use-require-account';
+import { GoogleButton } from '@/components/google-button';
 
 export const Route = createFileRoute('/item/$id')({
-  head: () => ({ meta: [{ title: 'Item details · Dorm Dump' }, { name: 'description', content: 'Explore a pre-loved dorm essential and arrange a campus pickup in the Dorm Dump demo.' }, { property: 'og:title', content: 'Item details · Dorm Dump' }, { property: 'og:description', content: 'Give a campus essential its next chapter.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }),
+  head: ({ params }) => ({ meta: [{ title: `${params.id} · Dorm Dump` }, { name: 'description', content: 'Details, pickup spot, and seller for this campus find on Dorm Dump.' }, { property: 'og:title', content: `${params.id} · Dorm Dump` }, { property: 'og:description', content: 'A pre-loved dorm essential from a fellow Bulldog.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }),
   component: ItemDetail,
 });
+
 function ItemDetail() {
   const { id } = Route.useParams();
   const { items, saved, toggleSave, reserved, reserve, setChatItem } = useMarketplace();
+  const { signedIn } = useAuth();
+  const requireAccount = useRequireAccount();
   const navigate = useNavigate();
-  const item = items.find(i => i.id === id);
-  if (!item) return <main className="page-container empty-state"><h1 className="text-2xl font-bold">Item not found</h1><Button asChild className="mt-5"><Link to="/">Back to marketplace</Link></Button></main>;
-  const isReserved = reserved.includes(id);
-  return <main className="page-container screen-enter"><Button variant="ghost" asChild className="mb-6 mt-3 pl-0"><Link to="/"><ArrowLeft />Back to marketplace</Link></Button><div className="detail-grid"><div><img className="detail-photo" src={item.image} alt={item.title} width={1024} height={1024} /><p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground"><Leaf size={14} />A second home, not a landfill.</p></div><div className="py-2"><div className="mb-4 flex items-center justify-between"><span className="rounded bg-secondary px-3 py-1 text-xs text-primary">{item.category}</span><Button variant="outline" size="icon" aria-label={saved.includes(id) ? 'Unsave item' : 'Save item'} title="Save item" onClick={() => toggleSave(id)}><Heart fill={saved.includes(id) ? 'currentColor' : 'none'} /></Button></div><h1 className="text-3xl font-bold leading-tight">{item.title}</h1><p className="mt-4 text-4xl font-bold text-primary">{item.price ? `$${item.price}` : 'Free'}<span className="ml-2 text-sm font-normal text-muted-foreground">{item.price ? 'USD' : 'to a fellow Bulldog'}</span></p><div className="mt-5 flex flex-wrap gap-4 text-xs text-muted-foreground"><span className="rounded bg-muted px-2 py-1 text-foreground">{item.condition}</span><span className="flex items-center gap-1"><MapPin size={14} />{item.location}</span><span className="self-center">{item.time}</span></div><section className="mt-7 border-y border-border py-6"><h2 className="mb-3 text-sm font-semibold">About this find</h2><p className="text-sm leading-7 text-muted-foreground">{item.description}</p></section><div className="my-6 flex items-center gap-3"><span className="avatar">{item.initials}</span><div><p className="text-sm font-semibold">{item.seller}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><ShieldCheck size={12} className="text-primary" />Student seller · Demo profile</p></div><span className="ml-auto flex items-center gap-1 text-xs"><Star size={13} className="text-warm-foreground" />5.0</span></div>{isReserved && <div role="status" className="mb-4 rounded-md bg-secondary p-4 text-sm text-primary"><p className="flex items-center gap-2 font-semibold"><Check size={17} />Reserved for you!</p><p className="mt-2 text-xs leading-5">Demo reservation confirmed. Message the seller to arrange a campus pickup. No payment has been taken.</p></div>}<div className="grid grid-cols-2 gap-3"><Button className="h-12" disabled={isReserved || item.mine} onClick={() => reserve(id)}>{isReserved ? <><Check />Reserved</> : 'Reserve item'}</Button><Button variant="outline" className="h-12" onClick={() => { setChatItem(item); navigate({ to: '/messages' }); }}><MessageCircle />Message seller</Button></div><p className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground"><ShieldCheck size={13} />Meet on campus. Keep your personal details private.</p></div></div></main>;
+  const item = items.find(i => i.id === id) ?? items[0];
+  if (!item) {
+    return <main className="page-container min-h-[60vh] screen-enter"><div className="empty-state"><MapPin className="mx-auto mb-3 text-primary" size={32} /><h2 className="text-xl font-semibold">That find is gone</h2><p className="mt-2 text-sm text-muted-foreground">It may have found a new home already.</p><Button asChild className="mt-5"><Link to="/">Back to the marketplace</Link></Button></div></main>;
+  }
+  const isSaved = saved.includes(item.id);
+  const isReserved = reserved.includes(item.id);
+
+  const onSave = () => {
+    if (!requireAccount('Sign in to save finds', 'Your saved list lives in your student account.')) return;
+    toggleSave(item.id);
+  };
+  const onReserve = () => {
+    if (!requireAccount('Sign in to reserve items', 'A hold is tied to your student account.', `/item/${item.id}`)) return;
+    reserve(item.id);
+  };
+  const onMessage = () => {
+    if (!requireAccount('Sign in to message sellers', 'Conversations live in your student account.', '/messages')) return;
+    setChatItem(item);
+    navigate({ to: '/messages' });
+  };
+
+  return <main className="page-container screen-enter">
+    <div className="flex items-center justify-between py-2"><Button variant="ghost" asChild className="pl-0"><Link to="/"><ArrowLeft />Back to marketplace</Link></Button><Button variant="ghost" size="icon" onClick={onSave} aria-label={`${isSaved ? 'Unsave' : 'Save'} ${item.title}`} className={isSaved ? 'text-primary' : ''}><Heart size={18} fill={isSaved ? 'currentColor' : 'none'} /></Button></div>
+    <div className="detail-grid">
+      <div className="detail-photo"><img src={item.image} alt={item.title} width={1024} height={1024} /><span className="item-badge">{item.condition}</span></div>
+      <div>
+        <div className="text-xs font-semibold text-primary">{item.category.toUpperCase()}</div>
+        <h1 className="mt-2 text-3xl font-bold leading-tight">{item.title}</h1>
+        <div className="mt-3 text-3xl font-bold text-primary">{item.price === 0 ? 'Free' : `$${item.price}`}</div>
+        <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground"><span className="flex items-center gap-1.5"><MapPin size={14} />{item.location}</span><span className="flex items-center gap-1.5"><CalendarDays size={14} />Listed {item.time}</span></div>
+        <p className="mt-5 text-sm leading-6 text-muted-foreground">{item.description}</p>
+        <div className="mt-6 rounded-md border border-border bg-muted/40 p-4"><div className="flex items-center gap-3"><span className="avatar">{item.initials}</span><div><div className="text-sm font-semibold">{item.seller}</div><div className="text-xs text-muted-foreground">AAMU student · Verified with school email</div></div><ShieldCheck size={18} className="ml-auto text-primary" /></div></div>
+        {signedIn ? <div className="mt-6 grid grid-cols-2 gap-3">
+          <Button className="h-11" onClick={onReserve} disabled={isReserved}><Check />{isReserved ? 'Reserved for you' : 'Reserve for pickup'}</Button>
+          <Button variant="outline" className="h-11" onClick={onMessage}><MessageCircle />Message seller</Button>
+        </div> : <div className="mt-6 rounded-md border border-border bg-card p-5">
+          <p className="text-sm font-semibold">Sign in to reserve or message</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">Browsing stays open to everyone. An account is what lets you hold this item and talk to the seller about pickup.</p>
+          <div className="mt-4"><GoogleButton /></div>
+        </div>}
+        <p className="mt-4 text-xs text-muted-foreground">Demo prototype · No payment is collected and nothing is charged.</p>
+      </div>
+    </div>
+  </main>;
 }

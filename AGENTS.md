@@ -9,5 +9,6 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep this prototype's sample marketplace state in a shared React context, without persistence or real authentication, so demo actions work across routes without implying live transactions.
+- Keep this prototype's sample marketplace state (listings, saves, holds, chat) in a shared React context without database persistence, so demo actions work across routes without implying live transactions.
+- Keep browsing the marketplace and item pages open to visitors, and put personal surfaces under the authenticated layout so every sign-in-only action is gated in one place rather than per component.
 - Use TanStack leaf routes for marketplace, item details, saved items, listings, and messages, so each screen supports forward and back navigation.
