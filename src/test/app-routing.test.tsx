@@ -10,6 +10,8 @@ function routeIds(path: string) {
   return router.matchRoutes(path).map((match) => match.routeId);
 }
 
+const behindSignIn = (path: string) => routeIds(path).some((id) => id.endsWith("_authenticated"));
+
 describe("App routing", () => {
   it("matches a page for / instead of falling back to not found", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
@@ -19,12 +21,12 @@ describe("App routing", () => {
   });
 
   it("keeps browsing open while personal pages sit behind the sign-in layout", () => {
-    expect(routeIds("/")).not.toContain("_authenticated");
-    expect(routeIds("/item/mini-fridge")).not.toContain("_authenticated");
-    expect(routeIds("/auth")).not.toContain("_authenticated");
+    expect(behindSignIn("/")).toBe(false);
+    expect(behindSignIn("/item/mini-fridge")).toBe(false);
+    expect(behindSignIn("/auth")).toBe(false);
 
     for (const path of ["/saved", "/my-listings", "/messages", "/sell", "/profile"]) {
-      expect(routeIds(path)).toContain("_authenticated");
+      expect(behindSignIn(path)).toBe(true);
     }
   });
 });
