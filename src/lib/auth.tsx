@@ -116,6 +116,8 @@ export function useSignOut() {
 
 export function initialsOf(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return 'CC';
-  return (parts[0][0] + (parts[1]?.[0] ?? parts[0][1] ?? '')).toUpperCase();
+  const first = parts[0];
+  if (!first) return 'CC';
+  const second = parts[1];
+  return (first.charAt(0) + (second ? second.charAt(0) : first.charAt(1))).toUpperCase();
 }
