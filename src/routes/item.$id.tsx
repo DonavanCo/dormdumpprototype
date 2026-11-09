@@ -19,6 +19,9 @@ function ItemDetail() {
   const requireAccount = useRequireAccount();
   const navigate = useNavigate();
   const item = items.find(i => i.id === id) ?? items[0];
+  if (!item) {
+    return <main className="page-container min-h-[60vh] screen-enter"><div className="empty-state"><MapPin className="mx-auto mb-3 text-primary" size={32} /><h2 className="text-xl font-semibold">That find is gone</h2><p className="mt-2 text-sm text-muted-foreground">It may have found a new home already.</p><Button asChild className="mt-5"><Link to="/">Back to the marketplace</Link></Button></div></main>;
+  }
   const isSaved = saved.includes(item.id);
   const isReserved = reserved.includes(item.id);
 
