@@ -230,3 +230,8 @@ button,a,input,select,textarea { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 700px) { .page-container { width: calc(100% - 32px); } .site-header { height: auto; } .header-inner { flex-wrap: wrap; gap: 12px; padding-top: 17px; } .brand { font-size: 22px; } .main-nav { order: 3; width: 100%; height: 43px; justify-content: space-between; gap: 12px; } .nav-item { font-size: 12px; } .header-actions .avatar { display: none; } .campus-bar { font-size: 10px; } .campus-bar > span:last-child { display: none; } .market-banner { min-height: 285px; } .banner-copy { padding: 26px 22px; } .banner-copy h1 { font-size: 30px; } .banner-image { width: 100%; opacity: .15; } .banner-copy p { max-width: 290px; } .banner-stats { gap: 14px; font-size: 10px; } .product-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; } .product-info { padding: 12px; } .product-title { font-size: 12px; } .product-meta { flex-wrap: wrap; gap: 5px; font-size: 10px; } .product-seller { font-size: 10px; } .filter-chip { padding-inline: 11px; font-size: 11px; } .detail-grid { grid-template-columns: 1fr; gap: 25px; } .footer { margin-top: 30px; } }
 @media (max-width: 700px) { .market-banner { display: block; } .banner-stats span { white-space: nowrap; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Signed-in account menu */
+.account-trigger { border: 0; padding: 0; background: none; cursor: pointer; border-radius: 50%; line-height: 0; }
+.account-trigger:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.account-avatar { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; display: block; }

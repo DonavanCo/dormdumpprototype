@@ -72,12 +72,3 @@ export function MarketplaceHeader() {
   </div></header><div className="page-container campus-bar"><span className="flex items-center gap-2"><MapPin size={13} /><strong className="font-medium text-foreground">Alabama A&amp;M University</strong><span className="mx-1">/</span>Brought to you by StudentX&nbsp;</span><span className="flex items-center gap-2"><ShieldCheck size={13} />Student community<span className="ml-3 rounded bg-secondary px-2 py-0.5 text-primary">Demo</span></span></div></>;
 }
 export function MarketplaceFooter() { return <footer className="footer"><div className="page-container flex flex-wrap items-center justify-between gap-3"><span className="flex items-center gap-2"><Leaf size={14} />Less waste. More possibility.</span><span>Dorm Dump · Alabama A&amp;M student prototype</span><span className="flex items-center gap-1">Made for the next chapter <ArrowUpRight size={13} /></span></div></footer>; }
-
-export function useGoSignIn() {
-  const navigate = useNavigate();
-  return (from: string) => {
-    // Remember the blocked page so signing in brings the student straight back.
-    void navigate({ to: '/auth' });
-    void from;
-  };
-}
